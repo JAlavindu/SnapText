@@ -1,16 +1,29 @@
-// Create the context menu item when the extension is installed
 chrome.runtime.onInstalled.addListener(() => {
+  // Context menu for images
   chrome.contextMenus.create({
-    id: "extract-text",
-    title: "Extract Text with SnapText",
-    contexts: ["all"],
+    id: "extract-from-image",
+    title: "Extract Text from This Image",
+    contexts: ["image"],
+  });
+
+  // Context menu for selecting screen area
+  chrome.contextMenus.create({
+    id: "extract-from-area",
+    title: "Extract Text from Selected Area",
+    contexts: ["page"],
   });
 });
 
-// Listen for clicks on the context menu item
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "extract-text") {
-    // Send a message to the content script to extract text
-    chrome.tabs.sendMessage(tab.id, { action: "extractText" });
+  if (info.menuItemId === "extract-from-image") {
+    // Send the image URL to content script
+    chrome.tabs.sendMessage(tab.id, {
+      action: "extractFromImage",
+      imageUrl: info.srcUrl,
+    });
+  } else if (info.menuItemId === "extract-from-area") {
+    chrome.tabs.sendMessage(tab.id, {
+      action: "extractFromArea",
+    });
   }
 });
