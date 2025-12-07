@@ -1,23 +1,24 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "extractFromImage") {
-    extractTextFromImage(request.imageUrl);
+    extractTextFromImage(request.imageData);
   } else if (request.action === "extractFromArea") {
     showToast("Area selection coming in Phase 6!", "#2196F3");
+  } else if (request.action === "showError") {
+    showToast(`❌ ${request.message}`, "#F44336");
   }
 });
 
-async function extractTextFromImage(imageUrl) {
+async function extractTextFromImage(imageData) {
   showToast("🔍 Analyzing image...", "#2196F3");
 
   try {
     const {
       data: { text },
-    } = await Tesseract.recognize(imageUrl, "eng", {
-      logger: (m) => console.log(m), // Progress logs
+    } = await Tesseract.recognize(imageData, "eng", {
+      logger: (m) => console.log(m),
     });
 
     if (text.trim()) {
-      // Copy to clipboard
       await navigator.clipboard.writeText(text);
       showToast(
         `✅ Text copied to clipboard!\n\n${text.substring(0, 100)}...`,
@@ -28,7 +29,7 @@ async function extractTextFromImage(imageUrl) {
     }
   } catch (error) {
     console.error("OCR Error:", error);
-    showToast("❌ Failed to extract text", "#F44336");
+    showToast("❌ Failed to extract text. Try a different image.", "#F44336");
   }
 }
 
