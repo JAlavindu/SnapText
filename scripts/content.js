@@ -12,14 +12,23 @@ async function extractTextFromImage(imageData) {
   showToast("🔍 Analyzing image...", "#2196F3");
 
   try {
-    const {
-      data: { text },
-    } = await Tesseract.recognize(imageData, "eng", {
+    // Configure Tesseract to use local files
+    const workerPath = chrome.runtime.getURL("libs/tesseract-worker.min.js");
+    const corePath = chrome.runtime.getURL("libs/tesseract-core.wasm.js");
+
+    const worker = await Tesseract.createWorker("eng", 1, {
+      workerPath: workerPath,
+      corePath: corePath,
       logger: (m) => console.log(m),
     });
 
+    const {
+      data: { text },
+    } = await worker.recognize(imageData);
+    await worker.terminate();
+
     if (text.trim()) {
-      await navigator.clipboard.writeText(text);
+      await copyToClipboard(text);
       showToast(
         `✅ Text copied to clipboard!\n\n${text.substring(0, 100)}...`,
         "#4CAF50"
@@ -30,6 +39,21 @@ async function extractTextFromImage(imageData) {
   } catch (error) {
     console.error("OCR Error:", error);
     showToast("❌ Failed to extract text. Try a different image.", "#F44336");
+  }
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (err) {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
   }
 }
 
