@@ -41,3 +41,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     });
   }
 });
+
+// 3. Handle Screenshot Requests (Phase 6)
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "capture_visible_tab") {
+    chrome.tabs.captureVisibleTab(null, { format: "png" }, (dataUrl) => {
+      sendResponse({ dataUrl: dataUrl });
+    });
+    return true; // Keep the message channel open for sendResponse
+  }
+});

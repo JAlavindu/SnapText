@@ -2,7 +2,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "extractFromImage") {
     extractTextFromImage(request.imageData);
   } else if (request.action === "extractFromArea") {
-    showToast("Area selection coming in Phase 6!", "#2196F3");
+    createOverlay();
   } else if (request.action === "showError") {
     showToast(`❌ ${request.message}`, "#F44336");
   }
@@ -81,3 +81,8 @@ function showToast(message, color) {
     toast.remove();
   }, 4000);
 }
+
+let overlay, selectionBox;
+let startX,
+  startY,
+  isSelecting = false;
