@@ -86,3 +86,34 @@ let overlay, selectionBox;
 let startX,
   startY,
   isSelecting = false;
+
+function createOverlay() {
+  if (document.getElementById("snaptext-overlay")) return;
+
+  showToast("🖱️ Select area to extract text", "#2196F3");
+
+  overlay = document.createElement("div");
+  overlay.id = "snaptext-overlay";
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2147483647;
+    cursor: crosshair;
+  `;
+
+  // 2. Create the selection rectangle
+  selectionBox = document.createElement("div");
+  selectionBox.style.cssText = `
+    position: absolute;
+    border: 2px dashed #fff;
+    background: rgba(255, 255, 255, 0.1);
+    display: none;
+    pointer-events: none;
+  `;
+  overlay.appendChild(selectionBox);
+  document.body.appendChild(overlay);
+}
