@@ -116,4 +116,61 @@ function createOverlay() {
   `;
   overlay.appendChild(selectionBox);
   document.body.appendChild(overlay);
+
+  // 3. Add mouse events
+  overlay.addEventListener("mousedown", onMouseDown);
+  overlay.addEventListener("mousemove", onMouseMove);
+  overlay.addEventListener("mouseup", onMouseUp);
+
+  //disable scrolling
+  document.body.style.overflow = "hidden";
+}
+
+function onMouseDown(e) {
+  isSelecting = true;
+  startX = e.clientX;
+  startY = e.clientY;
+
+  selectionBox.style.left = `${startX}px`;
+  selectionBox.style.top = `${startY}px`;
+  selectionBox.style.width = "0px";
+  selectionBox.style.height = "0px";
+  selectionBox.style.display = "block";
+}
+
+function onMouseMove(e) {
+  if (!isSelecting) return;
+
+  const currentX = e.clientX;
+  const currentY = e.clientY;
+
+  const width = Math.abs(currentX - startX);
+  const height = Math.abs(currentY - startY);
+
+  selectionBox.style.width = `${width}px`;
+  selectionBox.style.height = `${height}px`;
+  selectionBox.style.left = `${Math.min(currentX, startX)}px`;
+  selectionBox.style.top = `${Math.min(currentY, startY)}px`;
+}
+
+function onMouseUp(e) {
+  isSelecting = false;
+
+  const rect = selectionBox.getBoundingClientRect();
+  const selection = {
+    x: rect.left,
+    y: rect.top,
+    width: rect.width,
+    height: rect.height,
+  };
+
+  // Cleanup
+  document.body.removeChild(overlay);
+  document.body.style.overflow = "";
+
+  if (selection.width > 10 && selection.height > 10) {
+    requestScreenshot(selection);
+  } else {
+    showToast("⚠️ Selection too small, try again", "#FF9800");
+  }
 }
