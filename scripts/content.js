@@ -174,3 +174,44 @@ function onMouseUp(e) {
     showToast("⚠️ Selection too small, try again", "#FF9800");
   }
 }
+
+function requestScreenshot(selection) {
+  showToast("📸 Capturing selected area...", "#2196F3");
+  chrome.runtime.sendMessage({ action: "capture_visible_tab" }, (response) => {
+    if (response && response.dataUrl) {
+      cropAndExtract(response.dataUrl, selection);
+    } else {
+      showToast("❌ Failed to capture screenshot", "#F44336");
+    }
+  });
+}
+
+function cropAndExtract(dataUrl, selection) {
+  const img = new Image();
+
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = selection.width;
+    canvas.height = selection.height;
+
+    ctx.drawImage(
+      img,
+      selection.x * dpr,
+      selection.y * dpr,
+      selection.width * dpr,
+      selection.height * dpr,
+      0,
+      0,
+      selection.width,
+      selection.height
+    );
+
+    const croppedDataUrl = canvas.toDataURL("image/png");
+    extractTextFromImage(croppedDataUrl);
+  };
+  img.src = dataUrl;
+}
