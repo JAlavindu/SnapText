@@ -14,6 +14,15 @@ function extractTextFromImage(imageData) {
   chrome.runtime.sendMessage(
     { action: "performOCR", imageData: imageData },
     (response) => {
+      if (chrome.runtime.lastError) {
+        console.error("Runtime Error:", chrome.runtime.lastError);
+        showToast(
+          "❌ Communication Error: " + chrome.runtime.lastError.message,
+          "#F44336"
+        );
+        return;
+      }
+
       if (response && response.success) {
         const text = response.text;
         if (text && text.trim()) {
@@ -26,11 +35,9 @@ function extractTextFromImage(imageData) {
           showToast("⚠️ No text found in image", "#FF9800");
         }
       } else {
-        console.error(
-          "OCR Error:",
-          response ? response.error : "Unknown error"
-        );
-        showToast("❌ Failed to extract text.", "#F44336");
+        const errorMsg = response ? response.error : "Unknown error";
+        console.error("OCR Error:", errorMsg, response);
+        showToast(`❌ Failed: ${errorMsg}`, "#F44336");
       }
     }
   );
