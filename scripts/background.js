@@ -31,5 +31,43 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ dataUrl: dataUrl });
     });
     return true; // Keep the message channel open for sendResponse
+  } else if (request.action === "performOCR") {
+    handleOCR(request, sendResponse);
+    return true;
   }
 });
+
+async function handleOCR(request, sendResponse) {
+  await setupOffscreenDocument("offscreen.html");
+
+  // Send message to offscreen document
+  chrome.runtime.sendMessage(request, (response) => {
+    sendResponse(response);
+  });
+}
+
+let creating; // A global promise to avoid concurrency issues
+async function setupOffscreenDocument(path) {
+  // Check if offscreen document already exists
+  const existingContexts = await chrome.runtime.getContexts({
+    contextTypes: ["OFFSCREEN_DOCUMENT"],
+    documentUrls: [chrome.runtime.getURL(path)],
+  });
+
+  if (existingContexts.length > 0) {
+    return;
+  }
+
+  // Create offscreen document
+  if (creating) {
+    await creating;
+  } else {
+    creating = chrome.offscreen.createDocument({
+      url: path,
+      reasons: ["BLOBS"],
+      justification: "To process image data with Tesseract.js",
+    });
+    await creating;
+    creating = null;
+  }
+}
