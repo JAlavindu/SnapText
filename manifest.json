@@ -24,7 +24,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["libs/*"],
+      "resources": [
+        "libs/tesseract.min.js",
+        "libs/tesseract-core.wasm.js",
+        "libs/tesseract-worker.min.js"
+      ],
       "matches": ["<all_urls>"]
     }
   ],
