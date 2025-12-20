@@ -39,7 +39,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleOCR(request, sendResponse) {
   await setupOffscreenDocument("offscreen.html");
-
+  console.log("Forwarding OCR request to offscreen document");
   // Send message to offscreen document
   chrome.runtime.sendMessage(request, (response) => {
     sendResponse(response);

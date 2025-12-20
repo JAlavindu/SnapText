@@ -12,6 +12,10 @@ async function performOCR(imageData, sendResponse) {
     }
 
     console.log("Initializing Tesseract...");
+    console.log(
+      "Using workerPath:",
+      chrome.runtime.getURL("libs/tesseract-worker.min.js")
+    );
 
     // Use explicit initialization flow which is more robust across versions
     const worker = await Tesseract.createWorker({
