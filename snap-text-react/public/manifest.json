@@ -17,5 +17,8 @@
   },
   "icons":{
     "32":"32.png"
+  },
+  "background": {
+    "service_worker": "background.js"
   }
 }
