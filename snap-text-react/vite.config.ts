@@ -1,16 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
+    outDir: "dist",
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        background: "src/background/serviceWorker.ts",
-        content: "src/content/injector.ts"
+        background: resolve(__dirname, "src/background/serviceWorker.ts"),
+        content: resolve(__dirname, "src/content/injector.ts")
+      },
+      output: {
+        entryFileNames: "[name]/[name].js"
       }
-    },
-    outDir: "dist"
+    }
   }
-})
+});
