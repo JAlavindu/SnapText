@@ -1,6 +1,7 @@
 
 import Cropper from "./Cropper";
 import { runOCR } from "../../shared/ocr";
+import { useState } from "react";
 
 type Props = {
   imageUrl: string;
