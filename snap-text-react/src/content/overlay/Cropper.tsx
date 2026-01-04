@@ -5,7 +5,7 @@ type props = {
 
 import React from 'react'
 
-export default function Cropper() {
+export default function Cropper({ imageUrl, onCrop }: props) {
   return (
     <div>Cropper</div>
   )
