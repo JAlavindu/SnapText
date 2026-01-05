@@ -1,6 +1,7 @@
 
-import Cropper from "./Cropper";
 import { runOCR } from "../../shared/ocr";
+import Cropper from "./Cropper";
+
 import { useState } from "react";
 
 type Props = {
