@@ -18,6 +18,7 @@
   "icons":{
     "32":"32.png"
   },
+  "action": {},
   "background": {
     "service_worker": "background/background.js"
   }

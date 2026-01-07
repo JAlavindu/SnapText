@@ -25,29 +25,36 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "snaptext_extract" && tab?.id) {
-    const tabId = tab.id;
-    if (!tabId) return;
-
     if (info.srcUrl) {
-      chrome.tabs.sendMessage(tabId, { 
+      chrome.tabs.sendMessage(tab.id, { 
         action: "extract_text",
         imageUrl: info.srcUrl,
         selectionText: info.selectionText
       }).catch(err => console.log(err));
     } else {
-      // Capture visible tab for page/selection contexts
-      chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" })
-        .then(dataUrl => {
-          chrome.tabs.sendMessage(tabId, { 
-            action: "extract_text",
-            imageUrl: dataUrl,
-            selectionText: info.selectionText
-          }).catch(err => console.log(err));
-        })
-        .catch(err => console.error("Capture failed:", err));
+      captureAndSend(tab);
     }
   }
 });
+
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id) {
+    captureAndSend(tab);
+  }
+});
+
+async function captureAndSend(tab: chrome.tabs.Tab) {
+    if(!tab.id) return;
+    try {
+        const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" });
+        await chrome.tabs.sendMessage(tab.id, { 
+            action: "extract_text",
+            imageUrl: dataUrl
+        });
+    } catch (err) {
+        console.error("Capture failed:", err);
+    }
+}
 
 
 

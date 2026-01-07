@@ -1,13 +1,23 @@
 
 
-export default function cropImage(img: HTMLImageElement) {
-    const canvas = document.createElement("canvas");
-    canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
+export default function cropImage(
+  img: HTMLImageElement, 
+  crop: { x: number; y: number; width: number; height: number }
+) {
+  const canvas = document.createElement("canvas");
+  // Set canvas size to the crop size
+  canvas.width = crop.width;
+  canvas.height = crop.height;
 
   const ctx = canvas.getContext("2d");
-  ctx?.drawImage(img, 0, 0)
+  if (!ctx) return "";
 
+  // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+  ctx.drawImage(
+    img, 
+    crop.x, crop.y, crop.width, crop.height, // Source
+    0, 0, crop.width, crop.height            // Destination
+  );
 
-   return canvas.toDataURL("image/png");
+  return canvas.toDataURL("image/png");
 }
