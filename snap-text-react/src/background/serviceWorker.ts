@@ -8,6 +8,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  console.log("Context menu clicked", info, tab);
   if (info.menuItemId === "snaptext_extract" && tab?.id) {
     if (info.srcUrl) {
       chrome.tabs.sendMessage(tab.id, { 
